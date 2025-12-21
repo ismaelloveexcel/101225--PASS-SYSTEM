@@ -49,6 +49,19 @@ A mobile-first educational math game featuring a 3D bridge defense scene built w
 7. Wrong answers temporarily speed up all enemies
 8. Defend your base and progress through levels!
 
+## Deployment
+
+This game is automatically deployed to GitHub Pages whenever changes are pushed to the `main` branch.
+
+**Live Demo:** The game will be available at `https://ismaelloveexcel.github.io/101225--PASS-SYSTEM/`
+
+### Automatic Deployment
+
+The repository uses GitHub Actions to automatically deploy the game:
+- Any push to the `main` branch triggers automatic deployment
+- Manual deployment can be triggered from the Actions tab
+- No build process required - the game is deployed as-is
+
 ## Development
 
 This is a single-file HTML game with no dependencies beyond Three.js (loaded from CDN).
