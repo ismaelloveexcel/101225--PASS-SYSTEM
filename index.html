@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Roblox-Style Math Quest v4 (Mobile First)</title>
+  <style>
+    :root{
+      --bg: #06101f;
+      --panel: rgba(17,24,39,.74);
+      --panel2: rgba(2,6,23,.55);
+      --stroke: rgba(148,163,184,.22);
+      --accent: rgba(56,189,248,.25);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --ok: #22c55e;
+      --bad: #ef4444;
+      --shadow: 0 18px 55px rgba(0,0,0,.35);
+      --r: 14px;
+    }
+
+    html, body { margin:0; height:100%; overflow:hidden; font-family: system-ui, -apple-system, Segoe UI, Arial; background:var(--bg); color:var(--text); }
+    canvas { display:block; }
+
+    /* Safe area padding (iOS notch) */
+    .safeTop { padding-top: max(12px, env(safe-area-inset-top)); }
+    .safeBottom { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+
+    /* Top status bar (mobile-first) */
+    #topbar{
+      position: fixed;
+      left: 12px; right: 12px;
+      top: 0;
+      z-index: 20;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none; /* allow taps through except controls inside */
+    }
+
+    .chipbar{
+      pointer-events: auto;
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .chip{
+      display:inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(17,24,39,.60);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .chip b{ font-weight: 900; }
+
+    .btnTiny{
+      pointer-events: auto;
+      cursor:pointer;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: var(--accent);
+      color: var(--text);
+      font-weight: 850;
+      font-size: 12px;
+    }
+    .btnTiny:active{ transform: translateY(1px); }
+
+    /* Bottom sheet HUD */
+    #sheet{
+      position: fixed;
+      left: 12px; right: 12px;
+      bottom: 0;
+      z-index: 25;
+      pointer-events: none;
+    }
+
+    .panel{
+      pointer-events: auto;
+      backdrop-filter: blur(10px);
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+    }
+
+    #sheetInner{
+      padding: 12px;
+    }
+
+    .titleRow{
+      display:flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .title{
+      font-weight: 950;
+      letter-spacing: .2px;
+      font-size: 14px;
+    }
+    .muted{ color: var(--muted); font-size: 12px; line-height: 1.35; }
+
+    .bigQ{
+      font-size: 22px;
+      font-weight: 950;
+      line-height: 1.15;
+      margin: 8px 0 6px;
+      word-break: break-word;
+    }
+
+    .row{ display:flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+    input{
+      flex: 1 1 140px;
+      min-width: 140px;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,.25);
+      background: var(--panel2);
+      color: var(--text);
+      font-size: 18px;
+      outline: none;
+    }
+
+    button{
+      cursor:pointer;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,.25);
+      background: var(--accent);
+      color: var(--text);
+      font-weight: 900;
+      font-size: 14px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:active{ transform: translateY(1px); }
+
+    .ok{ color: var(--ok); font-weight: 950; }
+    .bad{ color: var(--bad); font-weight: 950; }
+
+    .weapons{
+      margin-top: 10px;
+      display:flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .weapons button{
+      white-space: nowrap;
+      background: rgba(34,197,94,.14);
+      flex: 0 0 auto;
+    }
+    .weapons button.active{
+      border-color: rgba(34,197,94,.9);
+      background: rgba(34,197,94,.26);
+    }
+
+    details{
+      margin-top: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,.15);
+      background: rgba(2,6,23,.35);
+      overflow: hidden;
+    }
+    summary{
+      cursor:pointer;
+      list-style: none;
+      padding: 10px 12px;
+      font-weight: 900;
+      font-size: 13px;
+      user-select:none;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    #steps{
+      padding: 10px 12px 12px;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text);
+    }
+
+    .footerRow{
+      margin-top: 8px;
+      display:flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .toggle{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      user-select:none;
+    }
+    .toggle input{ transform: scale(1.15); }
+
+    /* Start / Game Over overlay */
+    #overlay{
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display:flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: radial-gradient(ellipse at center, rgba(6,16,31,.45), rgba(2,6,23,.92));
+    }
+    #overlayCard{
+      max-width: 520px;
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--stroke);
+      background: rgba(17,24,39,.78);
+      box-shadow: var(--shadow);
+    }
+    #overlayCard h1{
+      margin: 0 0 6px;
+      font-size: 18px;
+      letter-spacing: .2px;
+    }
+    #overlayCard p{
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    #overlayCard .row{ margin-top: 10px; }
+
+    /* Desktop enhancement (optional) */
+    @media (min-width: 900px){
+      #topbar{ left: 16px; right: 16px; }
+      #sheet{ left: 16px; right: 16px; max-width: 560px; }
+      .bigQ{ font-size: 24px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="topbar" class="safeTop">
+    <div class="chipbar">
+      <div class="chip">Type: <b id="qType">—</b></div>
+      <div class="chip">Level: <b id="level">1</b></div>
+      <div class="chip">Coins: <b id="coins">0</b></div>
+      <div class="chip">Base HP: <b id="baseHp">100</b></div>
+    </div>
+    <div class="chipbar">
+      <button class="btnTiny" id="pauseBtn">Pause</button>
+      <button class="btnTiny" id="restartBtn">Restart</button>
+    </div>
+  </div>
+
+  <div id="sheet" class="safeBottom">
+    <div class="panel" id="sheetInner">
+      <div class="titleRow">
+        <div>
+          <div class="title">Roblox-Style Math Quest v4</div>
+          <div class="muted" id="story">Tip: Brackets → ×/÷ → +/−. For Find-X, isolate x.</div>
+        </div>
+        <div class="muted">Correct: <b id="correct">0</b> • Wrong: <b id="wrong">0</b> • Streak: <b id="streak">0</b></div>
+      </div>
+
+      <div class="bigQ" id="question">Press Start.</div>
+
+      <div class="row">
+        <input id="answer" type="number" inputmode="numeric" enterkeyhint="done" placeholder="Type answer…"/>
+        <button id="submit">Submit</button>
+        <button id="newQ">New</button>
+      </div>
+
+      <div class="muted" id="feedback" style="margin-top:10px;">Ready.</div>
+
+      <div class="weapons" aria-label="Weapons">
+        <button data-w="fist" class="active">Fist (Easy)</button>
+        <button data-w="pistol">Pistol (Mid)</button>
+        <button data-w="ar">AR (Burst)</button>
+        <button data-w="bomb">Bomb (Hard)</button>
+      </div>
+
+      <details id="hintBox">
+        <summary>Hint / Steps</summary>
+        <div id="steps">—</div>
+      </details>
+
+      <div class="footerRow">
+        <div class="muted">From Level 3: speed–distance–time. From Level 5: (x,y) target locks.</div>
+        <label class="toggle muted"><input type="checkbox" id="soundToggle" checked/>Sound</label>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay">
+    <div id="overlayCard">
+      <h1>Math Quest v4</h1>
+      <p>
+        Mobile-first: big question, bottom controls, and a Roblox-ish bridge defense scene.
+        Answer correctly to attack. Wrong answers temporarily speed up enemies.
+      </p>
+      <div class="row">
+        <button id="startBtn" style="flex:1;">Start</button>
+        <button id="startMutedBtn" style="flex:1;">Start (Muted)</button>
+      </div>
+      <p style="margin-top:10px;">
+        Tip: On iPhone, audio requires a user tap—this start screen handles that.
+      </p>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script>
+    // ---------------------------
+    // Helpers
+    // ---------------------------
+    const UI = (id) => document.getElementById(id);
+    const pick = (a) => a[Math.floor(Math.random() * a.length)];
+    const rint = (min,max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const fmt = (s) => s.replaceAll("*","×").replaceAll("/","÷");
+
+    // ---------------------------
+    // State
+    // ---------------------------
+    let running = false;
+    let paused = false;
+
+    let level = 1, coins = 0, baseHp = 100;
+    let correct = 0, wrong = 0, streak = 0;
+
+    let weapon = "fist";
+    let current = null;
+
+    let pendingArHits = 0;
+    let speedPenaltyT = 0; // seconds (not frames)
+
+    // ---------------------------
+    // Weapon config
+    // ---------------------------
+    const weaponConfig = {
+      fist:  { dmg: 10, mode: "easy" },
+      pistol:{ dmg: 18, mode: "mid"  },
+      ar:    { dmg: 14, mode: "mid"  },
+      bomb:  { dmg: 30, mode: "hard" }
+    };
+
+    function updateHUD(){
+      UI("level").textContent = level;
+      UI("coins").textContent = coins;
+      UI("baseHp").textContent = Math.max(0, Math.floor(baseHp));
+      UI("correct").textContent = correct;
+      UI("wrong").textContent = wrong;
+      UI("streak").textContent = streak;
+      UI("qType").textContent = current?.type ?? "—";
+    }
+
+    // ---------------------------
+    // Audio (WebAudio beeps)
+    // ---------------------------
+    let audioCtx = null;
+    function ensureAudio(){
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    function beep(freq=440, dur=0.08, type="sine", gain=0.06){
+      if (!UI("soundToggle").checked) return;
+      if (!audioCtx) return;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.value = gain;
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start();
+      o.stop(audioCtx.currentTime + dur);
+    }
+    const sfx = {
+      correct(){ beep(660,0.07,"triangle",0.06); setTimeout(()=>beep(880,0.08,"triangle",0.06), 60); },
+      wrong(){ beep(220,0.10,"sawtooth",0.05); },
+      coin(){ beep(1040,0.05,"square",0.04); setTimeout(()=>beep(1240,0.05,"square",0.04), 60); },
+      attack(){ beep(440,0.06,"square",0.05); },
+      levelUp(){ beep(880,0.10,"triangle",0.07); setTimeout(()=>beep(1100,0.10,"triangle",0.07), 100); }
+    };
+
+    // ---------------------------
+    // Questions (balanced for 8yo; scales up)
+    // ---------------------------
+    function genBodmas(mode){
+      // mobile-first + kid-friendly: keep numbers smaller early, scale with level
+      const scale = Math.min(1 + (level-1)*0.08, 1.6);
+      const addMax = Math.floor((mode==="easy" ? 25 : mode==="mid" ? 45 : 80) * scale);
+      const mulMax = Math.floor((mode==="easy" ? 6  : mode==="mid" ? 9  : 12) * Math.min(scale, 1.25));
+      const divMax = Math.max(6, Math.floor((mode==="easy" ? 6  : mode==="mid" ? 9  : 12) * Math.min(scale, 1.2)));
+
+      const patterns = [];
+
+      patterns.push(() => {
+        const a=rint(3,addMax), b=rint(2,mulMax), c=rint(2,mulMax);
+        return { display: fmt(`${a} + ${b}*${c}`), answer: a + b*c,
+          steps: `Multiply first:\n${b}×${c}=${b*c}\nThen add:\n${a}+${b*c}=${a+b*c}` };
+      });
+
+      patterns.push(() => {
+        const a=rint(2,Math.floor(addMax/2)), b=rint(2,Math.floor(addMax/2)), c=rint(2,mulMax);
+        return { display: fmt(`(${a} + ${b})*${c}`), answer: (a+b)*c,
+          steps: `Brackets:\n(${a}+${b})=${a+b}\nMultiply:\n${a+b}×${c}=${(a+b)*c}` };
+      });
+
+      patterns.push(() => {
+        const a=rint(2,mulMax), b=rint(2,mulMax), prod=a*b;
+        const c=rint(1, Math.min(addMax, Math.max(2, prod-1)));
+        return { display: fmt(`${a}*${b} - ${c}`), answer: prod - c,
+          steps: `Multiply:\n${a}×${b}=${prod}\nSubtract:\n${prod}-${c}=${prod-c}` };
+      });
+
+      patterns.push(() => {
+        const d=rint(2,divMax);
+        const b=rint(2,mulMax);
+        const k=rint(2,mulMax);
+        const c=d*k; // ensures divisible
+        const a=rint(2,addMax);
+        const expr = `${a} + (${b}*${c})/${d}`;
+        const val = a + (b*c)/d;
+        return { display: fmt(expr), answer: val,
+          steps: `Brackets:\n${b}×${c}=${b*c}\nDivide:\n${b*c}÷${d}=${(b*c)/d}\nAdd:\n${a}+${(b*c)/d}=${val}` };
+      });
+
+      if (mode==="hard"){
+        patterns.push(() => {
+          const a=rint(2,10), b=rint(2,10), c=rint(2,10), sub=rint(6,30);
+          const expr = `(${a}+${b})*${c} - ${sub}`;
+          const ans = (a+b)*c - sub;
+          return { display: fmt(expr), answer: ans,
+            steps: `Brackets:\n(${a}+${b})=${a+b}\nMultiply:\n${a+b}×${c}=${(a+b)*c}\nSubtract:\n${(a+b)*c}-${sub}=${ans}` };
+        });
+      }
+
+      const q = pick(patterns)();
+      return { type:"BODMAS", story: pick([
+        "Bridge defense: follow the order of operations.",
+        "Power shot: brackets first, then ×/÷, then +/−.",
+        "Precision hit: compute in the right order."
+      ]), ...q };
+    }
+
+    function genFindX(mode){
+      const easy = mode==="easy";
+      const patterns = [];
+
+      patterns.push(() => {
+        const x=rint(2,20), a=rint(2,18), b=x+a;
+        return { display:`Find x: x + ${a} = ${b}`, answer:x, steps:`Subtract ${a}:\nx=${b}-${a}=${x}` };
+      });
+
+      patterns.push(() => {
+        const x=rint(5,25), a=rint(2,12), b=x-a;
+        return { display:`Find x: x - ${a} = ${b}`, answer:x, steps:`Add ${a}:\nx=${b}+${a}=${x}` };
+      });
+
+      patterns.push(() => {
+        const a=pick([2,3,4,5,6,8,10]), x=rint(2,12), b=a*x;
+        return { display:`Find x: ${a} × x = ${b}`, answer:x, steps:`Divide by ${a}:\nx=${b}÷${a}=${x}` };
+      });
+
+      patterns.push(() => {
+        const a=pick([2,3,4,5,6,8,10]), b=rint(2,12), x=a*b;
+        return { display:`Find x: x ÷ ${a} = ${b}`, answer:x, steps:`Multiply by ${a}:\nx=${b}×${a}=${x}` };
+      });
+
+      if (!easy){
+        patterns.push(() => {
+          const a=pick([2,3,4,5]), x=rint(2,12), c=rint(1,15), d=a*x+c;
+          return { display:`Find x: ${a} × x + ${c} = ${d}`, answer:x,
+            steps:`Subtract ${c}:\n${a}×x=${d}-${c}=${a*x}\nDivide by ${a}:\nx=${a*x}÷${a}=${x}` };
+        });
+      }
+
+      const q = pick(patterns)();
+      return { type:"Find X", story: pick([
+        "Unlock ammo crate: isolate x.",
+        "Target lock: solve for x to aim.",
+        "Defuse sequence: find x step by step."
+      ]), ...q };
+    }
+
+    function genPhysics(mode){
+      const easy = mode==="easy";
+      const allowCoords = (level >= 5) && Math.random() < 0.40;
+
+      if (!allowCoords){
+        const speed = rint(2, easy ? 8 : 12);
+        const time  = rint(2, easy ? 10 : 14);
+        const dist  = speed * time;
+        const kind = pick(["DIST","TIME","SPEED"]);
+        if (kind==="DIST"){
+          return { type:"Physics", story:"Rocket lab: compute to fire the engine.",
+            display:`A drone moves at ${speed} m/s for ${time} s. Distance (m) = ?`,
+            answer: dist, steps:`Distance = speed × time\n= ${speed}×${time} = ${dist} m` };
+        }
+        if (kind==="TIME"){
+          return { type:"Physics", story:"Rocket lab: compute to stabilize flight.",
+            display:`A drone travels ${dist} m at ${speed} m/s. Time (s) = ?`,
+            answer: time, steps:`Time = distance ÷ speed\n= ${dist}÷${speed} = ${time} s` };
+        }
+        return { type:"Physics", story:"Rocket lab: compute to set motor speed.",
+          display:`A drone travels ${dist} m in ${time} s. Speed (m/s) = ?`,
+          answer: speed, steps:`Speed = distance ÷ time\n= ${dist}÷${time} = ${speed} m/s` };
+      }
+
+      const x = rint(20, 180);
+      const y = pick([40, 60, 69, 80, 100]);
+      const a = rint(10, 40);
+      const b = x + a;
+      return { type:"Coords", story:"Target lock: solve x to hit the enemy at (x,y).",
+        display:`Enemy at (x, ${y}). Solve: x + ${a} = ${b}. What is x?`,
+        answer: x, steps:`Subtract ${a}:\nx = ${b} - ${a} = ${x}` };
+    }
+
+    function pickQuestion(){
+      const wMode = weaponConfig[weapon].mode;
+      const physicsChance = (level >= 3) ? 0.35 : 0.0;
+      if (Math.random() < physicsChance) return genPhysics(wMode);
+      if (weapon==="fist")  return (Math.random()<0.55) ? genFindX("easy") : genBodmas("easy");
+      if (weapon==="bomb")  return (Math.random()<0.55) ? genBodmas("hard") : genFindX("mid");
+      return (Math.random()<0.55) ? genBodmas(wMode) : genFindX(wMode);
+    }
+
+    function newQuestion(){
+      current = pickQuestion();
+      UI("question").textContent = current.display;
+      UI("story").textContent = current.story;
+      UI("feedback").textContent = "Answer to attack.";
+      UI("answer").value = "";
+      UI("steps").textContent = current.steps || "—";
+      UI("hintBox").open = false;
+      updateHUD();
+      // focus without fighting iOS viewport too hard
+      setTimeout(()=>UI("answer").focus(), 50);
+    }
+
+    // ---------------------------
+    // Three.js scene
+    // ---------------------------
+    const scene = new THREE.Scene();
+
+    function makeSkyTexture(){
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      const g = c.getContext("2d");
+      const grd = g.createLinearGradient(0,0,0,512);
+      grd.addColorStop(0, "#0b2a66");
+      grd.addColorStop(0.55, "#06101f");
+      grd.addColorStop(1, "#020617");
+      g.fillStyle = grd; g.fillRect(0,0,512,512);
+      g.fillStyle = "rgba(255,255,255,0.65)";
+      for(let i=0;i<220;i++){
+        const x=Math.random()*512, y=Math.random()*260, r=Math.random()*1.6;
+        g.beginPath(); g.arc(x,y,r,0,Math.PI*2); g.fill();
+      }
+      return new THREE.CanvasTexture(c);
+    }
+
+    const sky = new THREE.Mesh(
+      new THREE.SphereGeometry(140, 32, 32),
+      new THREE.MeshBasicMaterial({ map: makeSkyTexture(), side: THREE.BackSide })
+    );
+    scene.add(sky);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 300);
+    camera.position.set(0, 14, 30);
+    camera.lookAt(0, 6, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.body.appendChild(renderer.domElement);
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+    const dir = new THREE.DirectionalLight(0xffffff, 0.95);
+    dir.position.set(18, 28, 12);
+    scene.add(dir);
+
+    // Clouds
+    const cloudGroup = new THREE.Group(); scene.add(cloudGroup);
+    function makeCloud(x,z,scale){
+      const geo = new THREE.PlaneGeometry(10*scale, 5*scale);
+      const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent:true, opacity:0.18, depthWrite:false });
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(x, 20, z);
+      m.rotation.x = -Math.PI/12;
+      m.userData.speed = 0.35 + Math.random()*0.35; // units/sec
+      cloudGroup.add(m);
+    }
+    for(let i=0;i<12;i++) makeCloud(-55 + i*10, -35 + (i%4)*18, 0.8 + Math.random()*1.4);
+
+    // Ground + water
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(240, 240),
+      new THREE.MeshLambertMaterial({ color: 0x0b2a24 })
+    );
+    ground.rotation.x = -Math.PI/2;
+    ground.position.y = 0;
+    scene.add(ground);
+
+    const water = new THREE.Mesh(
+      new THREE.PlaneGeometry(240, 70),
+      new THREE.MeshLambertMaterial({ color: 0x0b3a66, transparent:true, opacity:0.78 })
+    );
+    water.rotation.x = -Math.PI/2;
+    water.position.set(0, 0.02, 0);
+    scene.add(water);
+
+    // Bridge + base
+    const bridgeGroup = new THREE.Group(); scene.add(bridgeGroup);
+
+    function addBlock(parent, w,h,d, color, x,y,z){
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({ color }));
+      m.position.set(x,y,z);
+      parent.add(m);
+      return m;
+    }
+
+    addBlock(bridgeGroup, 26, 1.2, 8, 0x4b5563, 0, 5.2, 0);
+    addBlock(bridgeGroup, 26, 0.6, 0.6, 0x94a3b8, 0, 6.1, 3.9);
+    addBlock(bridgeGroup, 26, 0.6, 0.6, 0x94a3b8, 0, 6.1, -3.9);
+
+    for (let i=-10; i<=10; i+=5){
+      addBlock(bridgeGroup, 1.4, 7, 1.4, 0x374151, i, 1.9, 3.0);
+      addBlock(bridgeGroup, 1.4, 7, 1.4, 0x374151, i, 1.9, -3.0);
+    }
+
+    function addArch(centerX){
+      const arch = new THREE.Group();
+      arch.position.set(centerX, 0, 0);
+      bridgeGroup.add(arch);
+      const heights = [0.8, 1.2, 1.7, 2.2, 2.6, 2.2, 1.7, 1.2, 0.8];
+      const xs = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
+      for (let i=0;i<xs.length;i++){
+        addBlock(arch, 0.8, heights[i], 0.8, 0x334155, xs[i], 2.1 + heights[i]/2, 2.6);
+        addBlock(arch, 0.8, heights[i], 0.8, 0x334155, xs[i], 2.1 + heights[i]/2, -2.6);
+      }
+      addBlock(arch, 9.0, 0.5, 0.6, 0x1f2937, 0, 3.0, 0);
+    }
+    addArch(-6);
+    addArch(6);
+
+    const base = new THREE.Group(); scene.add(base);
+    const baseBody = new THREE.Mesh(
+      new THREE.BoxGeometry(6,4,6),
+      new THREE.MeshLambertMaterial({ color: 0x1f2937 })
+    );
+    baseBody.position.set(-18, 2, 0);
+    base.add(baseBody);
+
+    const baseDoor = new THREE.Mesh(
+      new THREE.BoxGeometry(1.6,2.2,0.3),
+      new THREE.MeshLambertMaterial({ color: 0x38bdf8 })
+    );
+    baseDoor.position.set(-15.1, 1.4, 0);
+    base.add(baseDoor);
+
+    function makeBlockyHuman(color=0x22c55e){
+      const g = new THREE.Group();
+      const mat = new THREE.MeshLambertMaterial({ color });
+
+      const head = new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,1.2), mat);
+      head.position.y = 3.8;
+      g.add(head);
+
+      const eyeMat = new THREE.MeshLambertMaterial({ color: 0x0b1220 });
+      const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,0.02), eyeMat);
+      eyeL.position.set(-0.3, 0.2, 0.61);
+      head.add(eyeL);
+      const eyeR = eyeL.clone();
+      eyeR.position.x = 0.3;
+      head.add(eyeR);
+
+      const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.08,0.02), eyeMat);
+      mouth.position.set(0, -0.1, 0.61);
+      head.add(mouth);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(1.5,2,1), mat);
+      body.position.y = 2.3;
+      g.add(body);
+
+      const armL = new THREE.Mesh(new THREE.BoxGeometry(0.6,1.8,0.6), mat);
+      armL.position.set(-1, 2.3, 0);
+      g.add(armL);
+      const armR = armL.clone();
+      armR.position.x = 1;
+      g.add(armR);
+
+      const legL = new THREE.Mesh(new THREE.BoxGeometry(0.6,2,0.6), mat);
+      legL.position.set(-0.4, 0.5, 0);
+      g.add(legL);
+      const legR = legL.clone();
+      legR.position.x = 0.4;
+      g.add(legR);
+
+      return g;
+    }
+
+    const player = makeBlockyHuman(0x22c55e);
+    player.position.set(-18, 4.5, 0);
+    scene.add(player);
+
+    // Enemies
+    let enemies = [];
+    let particles = [];
+
+    function addHpBar(parent) {
+      const barGroup = new THREE.Group();
+      const bg = new THREE.Mesh(
+        new THREE.BoxGeometry(1.8, 0.15, 0.1),
+        new THREE.MeshBasicMaterial({ color: 0x111827 })
+      );
+      barGroup.add(bg);
+
+      const fg = new THREE.Mesh(
+        new THREE.BoxGeometry(1.8, 0.15, 0.1),
+        new THREE.MeshBasicMaterial({ color: 0x22c55e })
+      );
+      fg.position.z = 0.01;
+      barGroup.add(fg);
+
+      barGroup.position.set(0, 5.2, 0);
+      parent.add(barGroup);
+      parent.userData.hpBarFg = fg;
+    }
+
+    function updateHpBar(e) {
+      const scaleX = Math.max(0, e.userData.hp / e.userData.maxHp);
+      const fg = e.userData.hpBarFg;
+      fg.scale.x = scaleX;
+      fg.position.x = -0.9 * (1 - scaleX);
+      const color = new THREE.Color().lerpColors(
+        new THREE.Color(0x22c55e),
+        new THREE.Color(0xef4444),
+        1 - scaleX
+      );
+      fg.material.color = color;
+    }
+
+    function makeEnemy() {
+      const e = makeBlockyHuman(0xef4444);
+      e.position.set(42 + Math.random()*18, 4, -3 + Math.random()*6);
+      e.userData.maxHp = 40 + level * 10;
+      e.userData.hp = e.userData.maxHp;
+      e.userData.speed = 2.2 + level * 0.22; // units/sec
+      addHpBar(e);
+      scene.add(e);
+      return e;
+    }
+
+    function spawnWave(){
+      enemies.forEach(e => scene.remove(e));
+      enemies = [];
+      const numEnemies = 3 + Math.floor(level / 2);
+      for (let i=0; i<numEnemies; i++) enemies.push(makeEnemy());
+    }
+
+    function createCoinParticles(pos) {
+      const count = 5;
+      for (let i=0; i<count; i++) {
+        const coin = new THREE.Mesh(
+          new THREE.SphereGeometry(0.2, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0xfacc15 })
+        );
+        coin.position.copy(pos);
+        coin.position.y += 1;
+        coin.userData.vx = (-0.5 + Math.random()) * 1.2;
+        coin.userData.vy = 2.0 + Math.random() * 1.2;
+        coin.userData.vz = (-0.5 + Math.random()) * 1.2;
+        coin.userData.life = 0.7 + Math.random()*0.4; // seconds
+        scene.add(coin);
+        particles.push(coin);
+      }
+    }
+
+    function defeatEnemy(e){
+      scene.remove(e);
+      enemies = enemies.filter(en => en !== e);
+      coins += 10 + level * 5;
+      sfx.coin();
+      createCoinParticles(e.position);
+      updateHUD();
+      if (enemies.length === 0) levelUp();
+    }
+
+    function levelUp(){
+      level++;
+      sfx.levelUp();
+      UI("feedback").innerHTML = '<span class="ok">Level Up!</span>';
+      baseHp = Math.min(100 + level * 10, 200);
+      spawnWave();
+      updateHUD();
+      newQuestion();
+    }
+
+    // Combat
+    function attack(){
+      sfx.attack();
+      enemies.sort((a,b)=> a.position.x - b.position.x);
+      const target = enemies[0];
+      if (!target) return;
+
+      let dmg = weaponConfig[weapon].dmg;
+      if (streak >= 5) dmg *= 1.2;
+
+      if (weapon === "ar") {
+        pendingArHits++;
+        if (pendingArHits < 2) {
+          UI("feedback").innerHTML = '<span class="ok">Correct!</span> (AR charging…)';
+          return;
+        }
+        pendingArHits = 0;
+        dmg *= 2;
+      } else if (weapon === "bomb") {
+        enemies.slice().forEach(en => {
+          en.userData.hp -= dmg / 2;
+          updateHpBar(en);
+          if (en.userData.hp <= 0) defeatEnemy(en);
+        });
+        return;
+      }
+
+      target.userData.hp -= dmg;
+      updateHpBar(target);
+      target.scale.set(0.95,0.95,0.95);
+      setTimeout(()=>target.scale.set(1,1,1), 90);
+
+      if (target.userData.hp <= 0) defeatEnemy(target);
+    }
+
+    // ---------------------------
+    // Submit / validation
+    // ---------------------------
+    function submitAnswer(){
+      if (!running || paused) return;
+      const ans = parseFloat(UI("answer").value);
+      if (isNaN(ans)) {
+        UI("feedback").innerHTML = '<span class="bad">Enter a number.</span>';
+        return;
+      }
+
+      if (Math.abs(ans - current.answer) < 0.01) {
+        UI("feedback").innerHTML = '<span class="ok">Correct!</span>';
+        sfx.correct();
+        correct++; streak++;
+        attack();
+      } else {
+        UI("feedback").innerHTML = '<span class="bad">Wrong.</span> Correct: ' + current.answer;
+        sfx.wrong();
+        wrong++; streak = 0;
+        speedPenaltyT = 3.0; // seconds of faster enemies
+      }
+      updateHUD();
+      newQuestion();
+    }
+
+    // ---------------------------
+    // Loop (delta-time)
+    // ---------------------------
+    let lastT = performance.now();
+
+    function animate(now){
+      requestAnimationFrame(animate);
+      if (!running) return;
+      if (paused) { lastT = now; return; }
+
+      const dt = Math.min(0.033, (now - lastT) / 1000); // cap for stability
+      lastT = now;
+
+      // clouds
+      cloudGroup.children.forEach(c => {
+        c.position.z += c.userData.speed * dt;
+        if (c.position.z > 70) c.position.z = -70;
+      });
+
+      // enemies advance
+      enemies.forEach(e => {
+        let sp = e.userData.speed;
+        if (speedPenaltyT > 0) sp *= 1.8;
+        e.position.x -= sp * dt;
+        e.position.y = 4 + Math.sin(now / 200 + e.position.x) * 0.1;
+
+        if (e.position.x < -15) {
+          baseHp -= (15 + level * 5);
+          scene.remove(e);
+          enemies = enemies.filter(en => en !== e);
+          updateHUD();
+          if (baseHp <= 0) gameOver();
+        }
+      });
+
+      // particles
+      particles.forEach(p => {
+        p.userData.life -= dt;
+        p.userData.vy -= 4.5 * dt; // gravity
+        p.position.x += p.userData.vx * dt;
+        p.position.y += p.userData.vy * dt;
+        p.position.z += p.userData.vz * dt;
+        if (p.userData.life <= 0) scene.remove(p);
+      });
+      particles = particles.filter(p => p.userData.life > 0);
+
+      if (speedPenaltyT > 0) speedPenaltyT -= dt;
+
+      renderer.render(scene, camera);
+    }
+
+    function gameOver(){
+      baseHp = 0;
+      updateHUD();
+      paused = true;
+      UI("feedback").innerHTML = '<span class="bad">Game Over.</span> Tap Restart.';
+    }
+
+    // ---------------------------
+    // Controls / lifecycle
+    // ---------------------------
+    function resetGame(){
+      level = 1; coins = 0; baseHp = 100;
+      correct = 0; wrong = 0; streak = 0;
+      pendingArHits = 0; speedPenaltyT = 0;
+      paused = false;
+
+      enemies.forEach(e => scene.remove(e));
+      enemies = [];
+      particles.forEach(p => scene.remove(p));
+      particles = [];
+
+      spawnWave();
+      newQuestion();
+      updateHUD();
+      UI("feedback").textContent = "Ready.";
+    }
+
+    function startGame(muted=false){
+      running = true;
+      if (muted) UI("soundToggle").checked = false;
+      ensureAudio();
+      // try resume (iOS)
+      audioCtx.resume?.();
+      UI("overlay").style.display = "none";
+      resetGame();
+      lastT = performance.now();
+    }
+
+    // Buttons
+    UI("startBtn").addEventListener("click", ()=> startGame(false));
+    UI("startMutedBtn").addEventListener("click", ()=> startGame(true));
+
+    UI("submit").addEventListener("click", submitAnswer);
+    UI("newQ").addEventListener("click", ()=> { if (running && !paused) newQuestion(); });
+
+    UI("pauseBtn").addEventListener("click", ()=>{
+      if (!running) return;
+      paused = !paused;
+      UI("pauseBtn").textContent = paused ? "Resume" : "Pause";
+      UI("feedback").textContent = paused ? "Paused." : "Back to the fight.";
+      if (!paused) setTimeout(()=>UI("answer").focus(), 50);
+    });
+
+    UI("restartBtn").addEventListener("click", ()=>{
+      if (!running) return;
+      paused = false;
+      UI("pauseBtn").textContent = "Pause";
+      resetGame();
+    });
+
+    // Weapon selection
+    document.querySelectorAll(".weapons button").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        document.querySelector(".weapons .active")?.classList.remove("active");
+        b.classList.add("active");
+        weapon = b.dataset.w;
+        pendingArHits = 0;
+        if (running && !paused) newQuestion();
+      });
+    });
+
+    // Enter key submits
+    UI("answer").addEventListener("keydown", (e)=>{
+      if (e.key === "Enter") submitAnswer();
+    });
+
+    // Pause when tab hidden (mobile app switch)
+    document.addEventListener("visibilitychange", ()=>{
+      if (!running) return;
+      if (document.hidden) {
+        paused = true;
+        UI("pauseBtn").textContent = "Resume";
+        UI("feedback").textContent = "Paused (background).";
+      }
+    });
+
+    // Resize
+    window.addEventListener("resize", ()=>{
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Start render loop immediately; gameplay starts after Start tap
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
