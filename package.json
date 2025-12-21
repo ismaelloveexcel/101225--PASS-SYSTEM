@@ -1,0 +1,119 @@
+{
+  "name": "roblox-math-quest-v4",
+  "version": "4.0.0",
+  "description": "Mobile-first educational math game with enhanced 3D graphics featuring real-time shadows, bloom effects, PBR materials, and dynamic lighting",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "python3 -m http.server 8000",
+    "open": "open index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ismaelloveexcel/101225--PASS-SYSTEM.git"
+  },
+  "keywords": [
+    "educational-game",
+    "math-game",
+    "threejs",
+    "3d-game",
+    "mobile-game",
+    "webgl",
+    "roblox-style",
+    "pbr-rendering",
+    "shadow-mapping",
+    "bloom-effects",
+    "physics-simulation",
+    "algebra",
+    "bodmas",
+    "bridge-defense"
+  ],
+  "author": "Claude AI",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "browser": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.min.js"
+  },
+  "cdn": {
+    "three": "0.160.0",
+    "baseUrl": "https://unpkg.com/three@0.160.0"
+  },
+  "features": {
+    "graphics": [
+      "Shadow Mapping (2048x2048)",
+      "Unreal Bloom Post-Processing",
+      "PBR Materials",
+      "ACES Filmic Tone Mapping",
+      "Atmospheric Fog",
+      "Animated Water",
+      "Multi-Light System",
+      "Emissive Materials",
+      "Particle Effects"
+    ],
+    "gameplay": [
+      "BODMAS Questions",
+      "Algebraic Equations",
+      "Physics Problems",
+      "Coordinate Systems",
+      "4 Weapon Types",
+      "Progressive Difficulty",
+      "Streak Bonuses",
+      "Bridge Defense Mechanics"
+    ],
+    "ui": [
+      "Mobile-First Design",
+      "iOS Safe Area Support",
+      "Touch Optimized",
+      "Bottom Sheet Controls",
+      "WebAudio Sound Effects",
+      "Pause/Resume",
+      "Auto-Pause on Background"
+    ]
+  },
+  "technical": {
+    "framework": "Vanilla JavaScript",
+    "renderer": "Three.js r160",
+    "architecture": "Single HTML File",
+    "buildProcess": "None Required",
+    "deployment": "Static Hosting",
+    "compatibility": {
+      "mobile": true,
+      "desktop": true,
+      "tablet": true,
+      "browsers": ["Chrome", "Firefox", "Safari", "Edge"]
+    }
+  },
+  "performance": {
+    "targetFPS": 60,
+    "shadowMapSize": 2048,
+    "maxPixelRatio": 2,
+    "optimizations": [
+      "Delta-time animations",
+      "Efficient shadow frustum",
+      "Optimized bloom threshold",
+      "Geometry reuse",
+      "Proper material disposal"
+    ]
+  },
+  "educational": {
+    "targetAge": "8-14 years",
+    "subjects": ["Mathematics", "Algebra", "Physics"],
+    "skills": [
+      "Order of Operations (BODMAS/PEMDAS)",
+      "Solving Linear Equations",
+      "Speed-Distance-Time Calculations",
+      "Coordinate Geometry",
+      "Mental Math",
+      "Problem Solving"
+    ],
+    "difficulty": {
+      "adaptive": true,
+      "modes": ["easy", "mid", "hard"],
+      "scalingFactor": 0.08
+    }
+  }
+}

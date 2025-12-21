@@ -1,0 +1,194 @@
+{
+  "gameState": {
+    "version": "4.0.0",
+    "timestamp": "2025-12-21T10:04:00Z",
+    "sessionId": "session-abc123",
+    "player": {
+      "stats": {
+        "level": 5,
+        "coins": 250,
+        "baseHp": 140,
+        "correct": 47,
+        "wrong": 8,
+        "streak": 12,
+        "maxStreak": 15,
+        "totalPlayTime": 1847
+      },
+      "equipment": {
+        "currentWeapon": "pistol",
+        "unlockedWeapons": ["fist", "pistol", "ar"]
+      },
+      "progress": {
+        "highestLevel": 5,
+        "totalEnemiesDefeated": 23,
+        "totalCoinsEarned": 250,
+        "questionsAnswered": {
+          "BODMAS": 25,
+          "Find X": 18,
+          "Physics": 4,
+          "Coords": 0
+        },
+        "accuracy": 0.8545
+      }
+    },
+    "currentSession": {
+      "running": true,
+      "paused": false,
+      "startTime": "2025-12-21T09:30:00Z",
+      "gameMode": "normal",
+      "soundEnabled": true
+    },
+    "currentWave": {
+      "enemies": [
+        {
+          "id": "enemy-001",
+          "position": {"x": 45, "y": 4, "z": 2},
+          "hp": 80,
+          "maxHp": 90,
+          "speed": 3.3,
+          "type": "standard"
+        },
+        {
+          "id": "enemy-002",
+          "position": {"x": 52, "y": 4, "z": -1},
+          "hp": 90,
+          "maxHp": 90,
+          "speed": 3.3,
+          "type": "standard"
+        }
+      ],
+      "particles": [],
+      "activeEffects": {
+        "speedPenalty": 0,
+        "streakBonus": true
+      }
+    },
+    "currentQuestion": {
+      "type": "BODMAS",
+      "display": "15 + 6 × 8",
+      "answer": 63,
+      "difficulty": "mid",
+      "story": "Bridge defense: follow the order of operations.",
+      "steps": "Multiply first:\n6×8=48\nThen add:\n15+48=63",
+      "timeStarted": "2025-12-21T09:58:30Z"
+    },
+    "achievements": [
+      {
+        "id": "first_correct",
+        "name": "First Strike",
+        "description": "Answer your first question correctly",
+        "unlocked": true,
+        "timestamp": "2025-12-21T09:31:15Z"
+      },
+      {
+        "id": "level_5",
+        "name": "Math Warrior",
+        "description": "Reach level 5",
+        "unlocked": true,
+        "timestamp": "2025-12-21T09:52:30Z"
+      },
+      {
+        "id": "streak_10",
+        "name": "Hot Streak",
+        "description": "Get 10 answers correct in a row",
+        "unlocked": true,
+        "timestamp": "2025-12-21T09:45:20Z"
+      },
+      {
+        "id": "defeat_50_enemies",
+        "name": "Bridge Guardian",
+        "description": "Defeat 50 enemies",
+        "unlocked": false,
+        "progress": 23
+      }
+    ],
+    "statistics": {
+      "session": {
+        "questionsAnswered": 55,
+        "correctAnswers": 47,
+        "wrongAnswers": 8,
+        "averageAnswerTime": 12.5,
+        "longestStreak": 15,
+        "coinsEarned": 250
+      },
+      "allTime": {
+        "totalSessions": 3,
+        "totalPlayTime": 5420,
+        "totalQuestions": 142,
+        "totalCorrect": 118,
+        "totalWrong": 24,
+        "highestLevel": 5,
+        "totalCoins": 680,
+        "favoriteWeapon": "pistol",
+        "strongestSubject": "BODMAS",
+        "weakestSubject": "Physics"
+      },
+      "performance": {
+        "accuracyByType": {
+          "BODMAS": 0.89,
+          "Find X": 0.84,
+          "Physics": 0.71,
+          "Coords": 0.00
+        },
+        "accuracyByDifficulty": {
+          "easy": 0.92,
+          "mid": 0.83,
+          "hard": 0.74
+        },
+        "averageTimeByType": {
+          "BODMAS": 11.2,
+          "Find X": 13.8,
+          "Physics": 18.5,
+          "Coords": 0
+        }
+      }
+    },
+    "settings": {
+      "graphics": {
+        "shadowsEnabled": true,
+        "bloomEnabled": true,
+        "fogEnabled": true,
+        "particlesEnabled": true,
+        "quality": "high"
+      },
+      "audio": {
+        "soundEnabled": true,
+        "volume": 1.0,
+        "effects": {
+          "correct": true,
+          "wrong": true,
+          "coin": true,
+          "attack": true,
+          "levelUp": true
+        }
+      },
+      "ui": {
+        "hintsEnabled": true,
+        "autoPause": true,
+        "showSteps": true
+      }
+    },
+    "leaderboard": {
+      "local": {
+        "highestLevel": 5,
+        "bestAccuracy": 0.8545,
+        "longestStreak": 15,
+        "mostCoins": 250
+      },
+      "rank": {
+        "level": 42,
+        "accuracy": 15,
+        "streak": 28
+      }
+    }
+  },
+  "metadata": {
+    "platform": "web",
+    "browser": "Chrome 120",
+    "device": "Desktop",
+    "screenResolution": "1920x1080",
+    "pixelRatio": 2,
+    "graphicsCapability": "high",
+    "webglVersion": "2.0"
+  }
+}
