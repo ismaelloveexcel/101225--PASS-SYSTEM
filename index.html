@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Roblox-Style Math Quest v4 (Mobile First)</title>
+  <title>Roblox-Style Math Quest v4 - Enhanced Graphics</title>
   <style>
     :root{
       --bg: #06101f;
@@ -37,7 +37,7 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      pointer-events: none; /* allow taps through except controls inside */
+      pointer-events: none;
     }
 
     .chipbar{
@@ -57,6 +57,7 @@
       border-radius: 999px;
       border: 1px solid var(--stroke);
       background: rgba(17,24,39,.60);
+      backdrop-filter: blur(10px);
       box-shadow: var(--shadow);
       font-size: 12px;
       line-height: 1;
@@ -74,7 +75,9 @@
       color: var(--text);
       font-weight: 850;
       font-size: 12px;
+      transition: all 0.2s;
     }
+    .btnTiny:hover{ transform: translateY(-1px); box-shadow: 0 4px 12px rgba(56,189,248,.3); }
     .btnTiny:active{ transform: translateY(1px); }
 
     /* Bottom sheet HUD */
@@ -88,7 +91,7 @@
 
     .panel{
       pointer-events: auto;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(14px);
       background: var(--panel);
       border: 1px solid var(--stroke);
       border-radius: var(--r);
@@ -133,7 +136,9 @@
       color: var(--text);
       font-size: 18px;
       outline: none;
+      transition: all 0.2s;
     }
+    input:focus{ border-color: rgba(56,189,248,.5); box-shadow: 0 0 0 3px rgba(56,189,248,.1); }
 
     button{
       cursor:pointer;
@@ -146,7 +151,9 @@
       font-size: 14px;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s;
     }
+    button:hover{ transform: translateY(-1px); box-shadow: 0 4px 12px rgba(56,189,248,.25); }
     button:active{ transform: translateY(1px); }
 
     .ok{ color: var(--ok); font-weight: 950; }
@@ -168,6 +175,7 @@
     .weapons button.active{
       border-color: rgba(34,197,94,.9);
       background: rgba(34,197,94,.26);
+      box-shadow: 0 0 12px rgba(34,197,94,.3);
     }
 
     details{
@@ -220,6 +228,7 @@
       justify-content: center;
       padding: 18px;
       background: radial-gradient(ellipse at center, rgba(6,16,31,.45), rgba(2,6,23,.92));
+      backdrop-filter: blur(8px);
     }
     #overlayCard{
       max-width: 520px;
@@ -227,7 +236,8 @@
       padding: 16px;
       border-radius: 16px;
       border: 1px solid var(--stroke);
-      background: rgba(17,24,39,.78);
+      background: rgba(17,24,39,.88);
+      backdrop-filter: blur(16px);
       box-shadow: var(--shadow);
     }
     #overlayCard h1{
@@ -243,7 +253,7 @@
     }
     #overlayCard .row{ margin-top: 10px; }
 
-    /* Desktop enhancement (optional) */
+    /* Desktop enhancement */
     @media (min-width: 900px){
       #topbar{ left: 16px; right: 16px; }
       #sheet{ left: 16px; right: 16px; max-width: 560px; }
@@ -270,7 +280,7 @@
     <div class="panel" id="sheetInner">
       <div class="titleRow">
         <div>
-          <div class="title">Roblox-Style Math Quest v4</div>
+          <div class="title">Roblox-Style Math Quest v4 ✨</div>
           <div class="muted" id="story">Tip: Brackets → ×/÷ → +/−. For Find-X, isolate x.</div>
         </div>
         <div class="muted">Correct: <b id="correct">0</b> • Wrong: <b id="wrong">0</b> • Streak: <b id="streak">0</b></div>
@@ -299,7 +309,7 @@
       </details>
 
       <div class="footerRow">
-        <div class="muted">From Level 3: speed–distance–time. From Level 5: (x,y) target locks.</div>
+        <div class="muted">Enhanced Graphics: Shadows • Bloom • PBR Materials</div>
         <label class="toggle muted"><input type="checkbox" id="soundToggle" checked/>Sound</label>
       </div>
     </div>
@@ -307,22 +317,27 @@
 
   <div id="overlay">
     <div id="overlayCard">
-      <h1>Math Quest v4</h1>
+      <h1>Math Quest v4 - Enhanced Graphics 🎮</h1>
       <p>
-        Mobile-first: big question, bottom controls, and a Roblox-ish bridge defense scene.
-        Answer correctly to attack. Wrong answers temporarily speed up enemies.
+        Mobile-first math game with stunning 3D graphics: real-time shadows, bloom effects, PBR materials, and dynamic lighting.
+        Answer correctly to attack. Wrong answers speed up enemies.
       </p>
       <div class="row">
         <button id="startBtn" style="flex:1;">Start</button>
         <button id="startMutedBtn" style="flex:1;">Start (Muted)</button>
       </div>
       <p style="margin-top:10px;">
-        Tip: On iPhone, audio requires a user tap—this start screen handles that.
+        Graphics: Shadow mapping, bloom, atmospheric fog, animated water, and enhanced particle effects.
       </p>
     </div>
   </div>
 
   <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/shaders/CopyShader.js"></script>
   <script>
     // ---------------------------
     // Helpers
@@ -345,7 +360,7 @@
     let current = null;
 
     let pendingArHits = 0;
-    let speedPenaltyT = 0; // seconds (not frames)
+    let speedPenaltyT = 0;
 
     // ---------------------------
     // Weapon config
@@ -368,7 +383,7 @@
     }
 
     // ---------------------------
-    // Audio (WebAudio beeps)
+    // Audio
     // ---------------------------
     let audioCtx = null;
     function ensureAudio(){
@@ -395,10 +410,9 @@
     };
 
     // ---------------------------
-    // Questions (balanced for 8yo; scales up)
+    // Questions
     // ---------------------------
     function genBodmas(mode){
-      // mobile-first + kid-friendly: keep numbers smaller early, scale with level
       const scale = Math.min(1 + (level-1)*0.08, 1.6);
       const addMax = Math.floor((mode==="easy" ? 25 : mode==="mid" ? 45 : 80) * scale);
       const mulMax = Math.floor((mode==="easy" ? 6  : mode==="mid" ? 9  : 12) * Math.min(scale, 1.25));
@@ -429,7 +443,7 @@
         const d=rint(2,divMax);
         const b=rint(2,mulMax);
         const k=rint(2,mulMax);
-        const c=d*k; // ensures divisible
+        const c=d*k;
         const a=rint(2,addMax);
         const expr = `${a} + (${b}*${c})/${d}`;
         const val = a + (b*c)/d;
@@ -546,34 +560,38 @@
       UI("steps").textContent = current.steps || "—";
       UI("hintBox").open = false;
       updateHUD();
-      // focus without fighting iOS viewport too hard
       setTimeout(()=>UI("answer").focus(), 50);
     }
 
     // ---------------------------
-    // Three.js scene
+    // Three.js ENHANCED scene
     // ---------------------------
     const scene = new THREE.Scene();
 
+    // Atmospheric fog
+    scene.fog = new THREE.Fog(0x06101f, 50, 150);
+
     function makeSkyTexture(){
       const c = document.createElement("canvas");
-      c.width = 512; c.height = 512;
+      c.width = 1024; c.height = 1024;
       const g = c.getContext("2d");
-      const grd = g.createLinearGradient(0,0,0,512);
-      grd.addColorStop(0, "#0b2a66");
-      grd.addColorStop(0.55, "#06101f");
+      const grd = g.createLinearGradient(0,0,0,1024);
+      grd.addColorStop(0, "#1e3a8a");
+      grd.addColorStop(0.3, "#0b2a66");
+      grd.addColorStop(0.65, "#06101f");
       grd.addColorStop(1, "#020617");
-      g.fillStyle = grd; g.fillRect(0,0,512,512);
-      g.fillStyle = "rgba(255,255,255,0.65)";
-      for(let i=0;i<220;i++){
-        const x=Math.random()*512, y=Math.random()*260, r=Math.random()*1.6;
+      g.fillStyle = grd; g.fillRect(0,0,1024,1024);
+      // More stars
+      g.fillStyle = "rgba(255,255,255,0.8)";
+      for(let i=0;i<400;i++){
+        const x=Math.random()*1024, y=Math.random()*500, r=Math.random()*2;
         g.beginPath(); g.arc(x,y,r,0,Math.PI*2); g.fill();
       }
       return new THREE.CanvasTexture(c);
     }
 
     const sky = new THREE.Mesh(
-      new THREE.SphereGeometry(140, 32, 32),
+      new THREE.SphereGeometry(145, 40, 40),
       new THREE.MeshBasicMaterial({ map: makeSkyTexture(), side: THREE.BackSide })
     );
     scene.add(sky);
@@ -582,60 +600,131 @@
     camera.position.set(0, 14, 30);
     camera.lookAt(0, 6, 0);
 
-    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+    // ENHANCED RENDERER with shadows
+    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:"high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
     document.body.appendChild(renderer.domElement);
 
-    // Lights
-    scene.add(new THREE.AmbientLight(0xffffff, 0.65));
-    const dir = new THREE.DirectionalLight(0xffffff, 0.95);
-    dir.position.set(18, 28, 12);
-    scene.add(dir);
+    // POST-PROCESSING
+    const composer = new THREE.EffectComposer(renderer);
+    const renderPass = new THREE.RenderPass(scene, camera);
+    composer.addPass(renderPass);
 
-    // Clouds
+    const bloomPass = new THREE.UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      0.6,  // strength
+      0.4,  // radius
+      0.85  // threshold
+    );
+    composer.addPass(bloomPass);
+
+    // Enhanced lighting
+    const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambient);
+
+    const dirLight = new THREE.DirectionalLight(0xffeedd, 1.5);
+    dirLight.position.set(20, 35, 15);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
+    dirLight.shadow.camera.left = -50;
+    dirLight.shadow.camera.right = 50;
+    dirLight.shadow.camera.top = 50;
+    dirLight.shadow.camera.bottom = -50;
+    dirLight.shadow.camera.near = 1;
+    dirLight.shadow.camera.far = 100;
+    dirLight.shadow.bias = -0.001;
+    scene.add(dirLight);
+
+    // Additional accent lights
+    const blueLight = new THREE.PointLight(0x38bdf8, 0.8, 40);
+    blueLight.position.set(-18, 8, 0);
+    scene.add(blueLight);
+
+    const redLight = new THREE.PointLight(0xef4444, 0.6, 30);
+    redLight.position.set(40, 6, 0);
+    scene.add(redLight);
+
+    // Enhanced clouds
     const cloudGroup = new THREE.Group(); scene.add(cloudGroup);
     function makeCloud(x,z,scale){
-      const geo = new THREE.PlaneGeometry(10*scale, 5*scale);
-      const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent:true, opacity:0.18, depthWrite:false });
+      const geo = new THREE.PlaneGeometry(12*scale, 6*scale);
+      const mat = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        transparent:true,
+        opacity:0.25,
+        depthWrite:false,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.05
+      });
       const m = new THREE.Mesh(geo, mat);
-      m.position.set(x, 20, z);
+      m.position.set(x, 22, z);
       m.rotation.x = -Math.PI/12;
-      m.userData.speed = 0.35 + Math.random()*0.35; // units/sec
+      m.userData.speed = 0.4 + Math.random()*0.4;
       cloudGroup.add(m);
     }
-    for(let i=0;i<12;i++) makeCloud(-55 + i*10, -35 + (i%4)*18, 0.8 + Math.random()*1.4);
+    for(let i=0;i<16;i++) makeCloud(-60 + i*11, -40 + (i%5)*18, 0.9 + Math.random()*1.6);
 
-    // Ground + water
+    // Enhanced ground with PBR material
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(240, 240),
-      new THREE.MeshLambertMaterial({ color: 0x0b2a24 })
+      new THREE.PlaneGeometry(240, 240, 20, 20),
+      new THREE.MeshStandardMaterial({
+        color: 0x0d3a28,
+        roughness: 0.95,
+        metalness: 0.05
+      })
     );
     ground.rotation.x = -Math.PI/2;
     ground.position.y = 0;
+    ground.receiveShadow = true;
     scene.add(ground);
 
+    // Enhanced water with animation
     const water = new THREE.Mesh(
-      new THREE.PlaneGeometry(240, 70),
-      new THREE.MeshLambertMaterial({ color: 0x0b3a66, transparent:true, opacity:0.78 })
+      new THREE.PlaneGeometry(240, 70, 30, 15),
+      new THREE.MeshStandardMaterial({
+        color: 0x0b3a66,
+        transparent:true,
+        opacity:0.85,
+        roughness: 0.3,
+        metalness: 0.7,
+        emissive: 0x0b3a66,
+        emissiveIntensity: 0.1
+      })
     );
     water.rotation.x = -Math.PI/2;
-    water.position.set(0, 0.02, 0);
+    water.position.set(0, 0.05, 0);
+    water.receiveShadow = true;
     scene.add(water);
 
-    // Bridge + base
+    // Bridge with PBR materials
     const bridgeGroup = new THREE.Group(); scene.add(bridgeGroup);
 
-    function addBlock(parent, w,h,d, color, x,y,z){
-      const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({ color }));
+    function addBlock(parent, w,h,d, color, x,y,z, metalness=0.1, roughness=0.8){
+      const m = new THREE.Mesh(
+        new THREE.BoxGeometry(w,h,d),
+        new THREE.MeshStandardMaterial({
+          color,
+          metalness,
+          roughness,
+          envMapIntensity: 0.5
+        })
+      );
       m.position.set(x,y,z);
+      m.castShadow = true;
+      m.receiveShadow = true;
       parent.add(m);
       return m;
     }
 
-    addBlock(bridgeGroup, 26, 1.2, 8, 0x4b5563, 0, 5.2, 0);
-    addBlock(bridgeGroup, 26, 0.6, 0.6, 0x94a3b8, 0, 6.1, 3.9);
-    addBlock(bridgeGroup, 26, 0.6, 0.6, 0x94a3b8, 0, 6.1, -3.9);
+    addBlock(bridgeGroup, 26, 1.2, 8, 0x4b5563, 0, 5.2, 0, 0.2, 0.7);
+    addBlock(bridgeGroup, 26, 0.6, 0.6, 0x94a3b8, 0, 6.1, 3.9, 0.5, 0.5);
+    addBlock(bridgeGroup, 26, 0.6, 0.6, 0x94a3b8, 0, 6.1, -3.9, 0.5, 0.5);
 
     for (let i=-10; i<=10; i+=5){
       addBlock(bridgeGroup, 1.4, 7, 1.4, 0x374151, i, 1.9, 3.0);
@@ -658,29 +747,38 @@
     addArch(6);
 
     const base = new THREE.Group(); scene.add(base);
-    const baseBody = new THREE.Mesh(
-      new THREE.BoxGeometry(6,4,6),
-      new THREE.MeshLambertMaterial({ color: 0x1f2937 })
-    );
-    baseBody.position.set(-18, 2, 0);
-    base.add(baseBody);
+    const baseBody = addBlock(base, 6,4,6, 0x1f2937, -18, 2, 0, 0.15, 0.75);
 
     const baseDoor = new THREE.Mesh(
       new THREE.BoxGeometry(1.6,2.2,0.3),
-      new THREE.MeshLambertMaterial({ color: 0x38bdf8 })
+      new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        metalness: 0.7,
+        roughness: 0.3,
+        emissive: 0x38bdf8,
+        emissiveIntensity: 0.3
+      })
     );
     baseDoor.position.set(-15.1, 1.4, 0);
+    baseDoor.castShadow = true;
     base.add(baseDoor);
 
-    function makeBlockyHuman(color=0x22c55e){
+    function makeBlockyHuman(color=0x22c55e, emissive=0x000000){
       const g = new THREE.Group();
-      const mat = new THREE.MeshLambertMaterial({ color });
+      const mat = new THREE.MeshStandardMaterial({
+        color,
+        metalness: 0.1,
+        roughness: 0.8,
+        emissive,
+        emissiveIntensity: 0.2
+      });
 
       const head = new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,1.2), mat);
       head.position.y = 3.8;
+      head.castShadow = true;
       g.add(head);
 
-      const eyeMat = new THREE.MeshLambertMaterial({ color: 0x0b1220 });
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x0b1220, emissive: 0x0b1220 });
       const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,0.02), eyeMat);
       eyeL.position.set(-0.3, 0.2, 0.61);
       head.add(eyeL);
@@ -694,10 +792,12 @@
 
       const body = new THREE.Mesh(new THREE.BoxGeometry(1.5,2,1), mat);
       body.position.y = 2.3;
+      body.castShadow = true;
       g.add(body);
 
       const armL = new THREE.Mesh(new THREE.BoxGeometry(0.6,1.8,0.6), mat);
       armL.position.set(-1, 2.3, 0);
+      armL.castShadow = true;
       g.add(armL);
       const armR = armL.clone();
       armR.position.x = 1;
@@ -705,6 +805,7 @@
 
       const legL = new THREE.Mesh(new THREE.BoxGeometry(0.6,2,0.6), mat);
       legL.position.set(-0.4, 0.5, 0);
+      legL.castShadow = true;
       g.add(legL);
       const legR = legL.clone();
       legR.position.x = 0.4;
@@ -713,11 +814,12 @@
       return g;
     }
 
-    const player = makeBlockyHuman(0x22c55e);
+    const player = makeBlockyHuman(0x22c55e, 0x22c55e);
     player.position.set(-18, 4.5, 0);
+    player.castShadow = true;
     scene.add(player);
 
-    // Enemies
+    // Enemies & Particles
     let enemies = [];
     let particles = [];
 
@@ -755,11 +857,12 @@
     }
 
     function makeEnemy() {
-      const e = makeBlockyHuman(0xef4444);
+      const e = makeBlockyHuman(0xef4444, 0xef4444);
       e.position.set(42 + Math.random()*18, 4, -3 + Math.random()*6);
       e.userData.maxHp = 40 + level * 10;
       e.userData.hp = e.userData.maxHp;
-      e.userData.speed = 2.2 + level * 0.22; // units/sec
+      e.userData.speed = 2.2 + level * 0.22;
+      e.castShadow = true;
       addHpBar(e);
       scene.add(e);
       return e;
@@ -773,18 +876,25 @@
     }
 
     function createCoinParticles(pos) {
-      const count = 5;
+      const count = 8;
       for (let i=0; i<count; i++) {
         const coin = new THREE.Mesh(
-          new THREE.SphereGeometry(0.2, 8, 8),
-          new THREE.MeshBasicMaterial({ color: 0xfacc15 })
+          new THREE.SphereGeometry(0.25, 12, 12),
+          new THREE.MeshStandardMaterial({
+            color: 0xfacc15,
+            metalness: 0.9,
+            roughness: 0.2,
+            emissive: 0xfacc15,
+            emissiveIntensity: 0.5
+          })
         );
         coin.position.copy(pos);
         coin.position.y += 1;
-        coin.userData.vx = (-0.5 + Math.random()) * 1.2;
-        coin.userData.vy = 2.0 + Math.random() * 1.2;
-        coin.userData.vz = (-0.5 + Math.random()) * 1.2;
-        coin.userData.life = 0.7 + Math.random()*0.4; // seconds
+        coin.userData.vx = (-0.6 + Math.random()*1.2) * 1.5;
+        coin.userData.vy = 2.5 + Math.random() * 1.5;
+        coin.userData.vz = (-0.6 + Math.random()*1.2) * 1.5;
+        coin.userData.life = 0.8 + Math.random()*0.5;
+        coin.castShadow = true;
         scene.add(coin);
         particles.push(coin);
       }
@@ -803,7 +913,7 @@
     function levelUp(){
       level++;
       sfx.levelUp();
-      UI("feedback").innerHTML = '<span class="ok">Level Up!</span>';
+      UI("feedback").innerHTML = '<span class="ok">Level Up! ⭐</span>';
       baseHp = Math.min(100 + level * 10, 200);
       spawnWave();
       updateHUD();
@@ -823,7 +933,7 @@
       if (weapon === "ar") {
         pendingArHits++;
         if (pendingArHits < 2) {
-          UI("feedback").innerHTML = '<span class="ok">Correct!</span> (AR charging…)';
+          UI("feedback").innerHTML = '<span class="ok">Correct! 🎯</span> (AR charging…)';
           return;
         }
         pendingArHits = 0;
@@ -839,15 +949,13 @@
 
       target.userData.hp -= dmg;
       updateHpBar(target);
-      target.scale.set(0.95,0.95,0.95);
-      setTimeout(()=>target.scale.set(1,1,1), 90);
+      target.scale.set(0.93,0.93,0.93);
+      setTimeout(()=>target.scale.set(1,1,1), 100);
 
       if (target.userData.hp <= 0) defeatEnemy(target);
     }
 
-    // ---------------------------
-    // Submit / validation
-    // ---------------------------
+    // Submit
     function submitAnswer(){
       if (!running || paused) return;
       const ans = parseFloat(UI("answer").value);
@@ -857,7 +965,7 @@
       }
 
       if (Math.abs(ans - current.answer) < 0.01) {
-        UI("feedback").innerHTML = '<span class="ok">Correct!</span>';
+        UI("feedback").innerHTML = '<span class="ok">Correct! ✨</span>';
         sfx.correct();
         correct++; streak++;
         attack();
@@ -865,15 +973,13 @@
         UI("feedback").innerHTML = '<span class="bad">Wrong.</span> Correct: ' + current.answer;
         sfx.wrong();
         wrong++; streak = 0;
-        speedPenaltyT = 3.0; // seconds of faster enemies
+        speedPenaltyT = 3.0;
       }
       updateHUD();
       newQuestion();
     }
 
-    // ---------------------------
-    // Loop (delta-time)
-    // ---------------------------
+    // Animation loop with delta time
     let lastT = performance.now();
 
     function animate(now){
@@ -881,21 +987,34 @@
       if (!running) return;
       if (paused) { lastT = now; return; }
 
-      const dt = Math.min(0.033, (now - lastT) / 1000); // cap for stability
+      const dt = Math.min(0.033, (now - lastT) / 1000);
       lastT = now;
 
-      // clouds
+      // Animate water
+      const waterGeo = water.geometry;
+      const pos = waterGeo.attributes.position;
+      for (let i=0; i<pos.count; i++){
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        pos.setZ(i, Math.sin(x * 0.3 + now / 800) * 0.15 + Math.cos(y * 0.3 + now / 600) * 0.1);
+      }
+      pos.needsUpdate = true;
+
+      // Clouds
       cloudGroup.children.forEach(c => {
         c.position.z += c.userData.speed * dt;
-        if (c.position.z > 70) c.position.z = -70;
+        if (c.position.z > 75) c.position.z = -75;
       });
 
-      // enemies advance
+      // Enemies
       enemies.forEach(e => {
         let sp = e.userData.speed;
         if (speedPenaltyT > 0) sp *= 1.8;
         e.position.x -= sp * dt;
-        e.position.y = 4 + Math.sin(now / 200 + e.position.x) * 0.1;
+        e.position.y = 4 + Math.sin(now / 200 + e.position.x) * 0.12;
+
+        // Animate enemy rotation
+        e.rotation.y = Math.sin(now / 500) * 0.1;
 
         if (e.position.x < -15) {
           baseHp -= (15 + level * 5);
@@ -906,32 +1025,36 @@
         }
       });
 
-      // particles
+      // Particles
       particles.forEach(p => {
         p.userData.life -= dt;
-        p.userData.vy -= 4.5 * dt; // gravity
+        p.userData.vy -= 5.0 * dt;
         p.position.x += p.userData.vx * dt;
         p.position.y += p.userData.vy * dt;
         p.position.z += p.userData.vz * dt;
+        p.rotation.x += dt * 3;
+        p.rotation.y += dt * 4;
         if (p.userData.life <= 0) scene.remove(p);
       });
       particles = particles.filter(p => p.userData.life > 0);
 
       if (speedPenaltyT > 0) speedPenaltyT -= dt;
 
-      renderer.render(scene, camera);
+      // Animate player
+      player.rotation.y = Math.sin(now / 1000) * 0.05;
+
+      // Render with post-processing
+      composer.render();
     }
 
     function gameOver(){
       baseHp = 0;
       updateHUD();
       paused = true;
-      UI("feedback").innerHTML = '<span class="bad">Game Over.</span> Tap Restart.';
+      UI("feedback").innerHTML = '<span class="bad">Game Over 💥</span> Tap Restart.';
     }
 
-    // ---------------------------
-    // Controls / lifecycle
-    // ---------------------------
+    // Controls
     function resetGame(){
       level = 1; coins = 0; baseHp = 100;
       correct = 0; wrong = 0; streak = 0;
@@ -953,17 +1076,15 @@
       running = true;
       if (muted) UI("soundToggle").checked = false;
       ensureAudio();
-      // try resume (iOS)
-      audioCtx.resume?.();
+      audioCtx?.resume?.();
       UI("overlay").style.display = "none";
       resetGame();
       lastT = performance.now();
     }
 
-    // Buttons
+    // Event listeners
     UI("startBtn").addEventListener("click", ()=> startGame(false));
     UI("startMutedBtn").addEventListener("click", ()=> startGame(true));
-
     UI("submit").addEventListener("click", submitAnswer);
     UI("newQ").addEventListener("click", ()=> { if (running && !paused) newQuestion(); });
 
@@ -982,7 +1103,6 @@
       resetGame();
     });
 
-    // Weapon selection
     document.querySelectorAll(".weapons button").forEach(b=>{
       b.addEventListener("click", ()=>{
         document.querySelector(".weapons .active")?.classList.remove("active");
@@ -993,12 +1113,10 @@
       });
     });
 
-    // Enter key submits
     UI("answer").addEventListener("keydown", (e)=>{
       if (e.key === "Enter") submitAnswer();
     });
 
-    // Pause when tab hidden (mobile app switch)
     document.addEventListener("visibilitychange", ()=>{
       if (!running) return;
       if (document.hidden) {
@@ -1008,14 +1126,13 @@
       }
     });
 
-    // Resize
     window.addEventListener("resize", ()=>{
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Start render loop immediately; gameplay starts after Start tap
     requestAnimationFrame(animate);
   </script>
 </body>
