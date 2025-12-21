@@ -62,6 +62,8 @@ The repository uses GitHub Actions to automatically deploy the game:
 - Manual deployment can be triggered from the Actions tab
 - No build process required - the game is deployed as-is
 
+📖 **For detailed setup instructions, see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)**
+
 ## Development
 
 This is a single-file HTML game with no dependencies beyond Three.js (loaded from CDN).

@@ -1,0 +1,33 @@
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.log
+*.tmp
+tmp/
+temp/
+
+# Node modules (if ever used)
+node_modules/
+npm-debug.log*
+
+# Python (if ever used)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
